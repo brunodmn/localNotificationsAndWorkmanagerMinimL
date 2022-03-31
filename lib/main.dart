@@ -1,6 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:workmanager/workmanager.dart';
+
+import 'services/notification_service.dart';
+
+callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    debugPrint('task $task called on _callbackDispatcher');
+    try {
+      await NotificationService.initialize();
+      await NotificationService.showNotification(
+          title: 'Worked', body: 'Yeah', id: 0);
+      return Future.value(true);
+    } catch (e) {
+      debugPrint('task error > $e');
+      return Future.error('does not work e > $e');
+    }
+  });
+}
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  Workmanager().initialize(callbackDispatcher, isInDebugMode: true);
+  Workmanager().registerOneOffTask('foo', 'foo');
   runApp(const MyApp());
 }
 
